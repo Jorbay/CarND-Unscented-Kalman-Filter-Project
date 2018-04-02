@@ -55,11 +55,17 @@ public:
   ///* Radar measurement noise standard deviation radius change in m/s
   double std_radrd_ ;
  
-  ///* Vector of process noise 
-  VectorXd process_noise_;
+  ///* Vector mean process noise 
+  VectorXd mean_process_noise_;
+
+  ///* Vector std process noise
+  VectorXd std_process_noise_;
 
   ///* State dimension
   int n_x_;
+
+  ///* Noise dimension
+  int n_noise_;
 
   ///* Augmented state dimension
   int n_aug_;
@@ -92,6 +98,11 @@ public:
    * @param delta_t Time between k and k+1 in s
    */
   void Prediction(double delta_t);
+
+  /**
+   * Generates sigma points for prediction and update steps
+  */
+  void GenerateSigmaPoints(double delta_t);
 
   /**
    * Updates the state and the state covariance matrix using a laser measurement
