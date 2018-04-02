@@ -54,9 +54,9 @@ public:
 
   ///* Radar measurement noise standard deviation radius change in m/s
   double std_radrd_ ;
-
-  ///* Weights of sigma points
-  VectorXd weights_;
+ 
+  ///* Vector of process noise 
+  VectorXd process_noise_;
 
   ///* State dimension
   int n_x_;
@@ -66,7 +66,9 @@ public:
 
   ///* Sigma point spreading parameter
   double lambda_;
-
+  
+  ///* Weights of sigma points
+  VectorXd weights_;
 
   /**
    * Constructor

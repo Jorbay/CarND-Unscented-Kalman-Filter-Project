@@ -25,9 +25,11 @@ UKF::UKF() {
   P_ = MatrixXd(5, 5);
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
+  // this is probably too big
   std_a_ = 30;
 
   // Process noise standard deviation yaw acceleration in rad/s^2
+  //this one also seems too big 
   std_yawdd_ = 30;
   
   //DO NOT MODIFY measurement noise values below these are provided by the sensor manufacturer.
@@ -45,15 +47,29 @@ UKF::UKF() {
 
   // Radar measurement noise standard deviation radius change in m/s
   std_radrd_ = 0.3;
-  //DO NOT MODIFY measurement noise values above these are provided by the sensor manufacturer.
-  
-  /**
-  TODO:
 
-  Complete the initialization. See ukf.h for other member properties.
+  // Process noise vector
+  process_noise_ = VectorXd(2);
+  process_noise_(0) = std_a_;
+  process_noise_(1) = std_yawdd_;
 
-  Hint: one or more values initialized above might be wildly off...
-  */
+  // State dimension is determined by size of x_
+  n_x_ = x_.size();
+
+  // Augmented state dimension is determined by the sum of process noise elements and x elements
+  n_aug_ = n_x_ + process_noise_.size();
+ 
+  // lambda is an experimental constant
+  lambda_ = 3 - n_aug_;
+ 
+  //Weights for sigma points
+  weights_ = VectorXd(2*n_aug_ + 1);
+  weights_(0) = lambda_ / (lambda_ + n_aug_);
+  for (int i = 1; i < 2*n_aug_ + 1; i++) {
+    double weight_ = 0.5/(lambda_ + n_aug_);
+    weights_(i) = weight_;
+  }
+
 }
 
 UKF::~UKF() {}
