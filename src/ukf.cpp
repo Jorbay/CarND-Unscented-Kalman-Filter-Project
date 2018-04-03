@@ -88,7 +88,7 @@ UKF::UKF() {
   }
 
   //Sigma points matrix
-  Xsig_pred_ = MatrixXd(n_aug_,n_aug_);
+  Xsig_pred_ = MatrixXd(n_x_,n_x_);
 
 
 }
@@ -173,14 +173,57 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
  * measurement and this one.
  */
 void UKF::Prediction(double delta_t) {
-  GenerateSigmaPoints(delta_t);
+  MatrixXd Xsig_augmented_ = GenerateSigmaPoints(delta_t);
+  for (int i = 0; i<Xsig_augmented_.cols(); i++) {
+    double p_x = Xsig_augmented_(0,i);
+    double p_y = Xsig_augmented_(1,i);
+    double v = Xsig_augmented_(2,i);
+    double yaw = Xsig_augmented_(3,i);
+    double yaw_delta = Xsig_augmented_(4,i);
+    double nu_a = Xsig_augmented_(5,i);
+    double nu_yawdd = Xsig_augmented_(6,i);
+
+    double p_x_predicted, p_y_predicted, v_predicted, yaw_predicted, yaw_delta_predicted;
+    
+    if (fabs(yaw_delta) > 0.001) {
+      p_x_predicted = p_x + v/yaw_delta * (sin(yaw+yaw_delta*delta_t) - sin(yaw));
+      p_y_predicted = p_y + v/yaw_delta * ( cos(yaw) - cos(yaw+yaw_delta*delta_t));
+    }
+
+    else {
+      p_x_predicted = p_x + v*delta_t*cos(yaw);
+      p_y_predicted = p_y + v*delta_t*sin(yaw);
+    }
+  
+    v_predicted = v;
+    yaw_predicted = yaw+ yaw_delta*delta_t;
+    yaw_delta_predicted = yaw_delta;
+
+    //adding noise
+    p_x_predicted = p_x_predicted + 0.5*nu_a*pow(delta_t,2)*cos(yaw);
+    p_y_predicted = p_y_predicted + 0.5*nu_a*pow(delta_t,2)*sin(yaw);
+    v_predicted = v_predicted + nu_a*delta_t;
+    yaw_predicted = yaw_predicted + 0.5*nu_yawdd*pow(delta_t,2);
+    yaw_delta_predicted = yaw_delta_predicted + nu_yawdd*delta_t;
+
+    //assigning values to Xsig_pred_ to be utilized for a measurement update
+    Xsig_pred_(0,i) = p_x_predicted;
+    Xsig_pred_(1,i) = p_y_predicted;
+    Xsig_pred_(2,i) = v_predicted;
+    Xsig_pred_(3,i) = yaw_predicted;
+    Xsig_pred_(4,i) = yaw_delta_predicted;
+     
+  } 
+  
   
 }
 
 /**
  * Generates Sigma Points for current iteration of prediction and update
  */
-void UKF::GenerateSigmaPoints(double delta_t) {
+MatrixXd UKF::GenerateSigmaPoints(double delta_t) {
+  MatrixXd Xsig_augmented_ = MatrixXd(n_aug_,n_aug_);
+
   //Generating square root of augmented version of covariance matrix
   MatrixXd A = MatrixXd(n_aug_, n_aug_);
   A.fill(0.0);
@@ -196,15 +239,15 @@ void UKF::GenerateSigmaPoints(double delta_t) {
   x_aug_.tail(n_noise_) = mean_process_noise_;
 
   //Filling out sigma points matrix
-  Xsig_pred_.fill(0.0);
-  Xsig_pred_.col(0) = x_aug_;
+  Xsig_augmented_.fill(0.0);
+  Xsig_augmented_.col(0) = x_aug_;
 
   for (int i = 0; i < n_aug_; i++) {
-    Xsig_pred_.col(i+1) = x_aug_ + sqrt(lambda_ + n_aug_) * L.col(i);
-    Xsig_pred_.col(i+1+n_x_) = x_aug_ - sqrt(lambda_ + n_aug_) * L.col(i);
+    Xsig_augmented_.col(i+1) = x_aug_ + sqrt(lambda_ + n_aug_) * L.col(i);
+    Xsig_augmented_.col(i+1+n_x_) = x_aug_ - sqrt(lambda_ + n_aug_) * L.col(i);
   }
 
-  return; 
+  return Xsig_augmented_;
 
 }
 
@@ -238,3 +281,20 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
   You'll also need to calculate the radar NIS.
   */
 }
+
+VectorXd UKF::CalculateMean(MatrixXd input) {
+  VectorXd result = VectorXd(input.rows());
+  
+
+  return result;
+}
+
+MatrixXd UKF::CalculateCovarianceMatrix(MatrixXd input_a, MatrixXd input_b) {
+  MatrixXd result = MatrixXd(input_a.rows(),input_a.cols());
+
+
+
+  return result;
+}
+
+

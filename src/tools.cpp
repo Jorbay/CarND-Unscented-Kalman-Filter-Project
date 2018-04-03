@@ -39,3 +39,4 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
   //returning the result
   return rmse;
 }
+

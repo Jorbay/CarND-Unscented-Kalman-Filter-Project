@@ -102,7 +102,7 @@ public:
   /**
    * Generates sigma points for prediction and update steps
   */
-  void GenerateSigmaPoints(double delta_t);
+  MatrixXd GenerateSigmaPoints(double delta_t);
 
   /**
    * Updates the state and the state covariance matrix using a laser measurement
@@ -115,6 +115,17 @@ public:
    * @param meas_package The measurement at k+1
    */
   void UpdateRadar(MeasurementPackage meas_package);
+
+  /**
+    Returns the mean vector for a given matrix
+  */
+  VectorXd CalculateMean(MatrixXd input);
+
+  /**
+    Returns the covariance matrix for two matrices
+  */
+  MatrixXd CalculateCovarianceMatrix(MatrixXd input_a, MatrixXd input_b);
+
 };
 
 #endif /* UKF_H */
