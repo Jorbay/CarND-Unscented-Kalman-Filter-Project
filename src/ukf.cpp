@@ -109,8 +109,9 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
    
     switch(current_sensor)
     { 
-      case MeasurementPackage::SensorType::LASER : 
+      case MeasurementPackage::SensorType::RADAR : 
       {
+        
         float meas_rho = meas_package.raw_measurements_[0];
         float meas_phi = meas_package.raw_measurements_[1]; //in radians probably
         float meas_rho_delta = meas_package.raw_measurements_[2];
@@ -120,11 +121,12 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
         velocity = meas_rho_delta;
         phi = meas_phi;
         phi_delta = 0;
-      
+         
         break;
       } 
-      case MeasurementPackage::SensorType::RADAR :
+      case MeasurementPackage::SensorType::LASER :
       { 
+        
         float meas_x = meas_package.raw_measurements_[0];
         float meas_y = meas_package.raw_measurements_[1];
      
@@ -133,7 +135,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
         velocity = 0;
         phi = 0;
         phi_delta = 0;
- 
+        
         break;
       }
     } 
@@ -149,7 +151,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   time_us_ = meas_package.timestamp_;
  
   //Predicting state from previous state 
-  Prediction(elapsed_time); 
+  //Prediction(elapsed_time); 
 
   //Updating state based off latest measurement
   switch(current_sensor)
