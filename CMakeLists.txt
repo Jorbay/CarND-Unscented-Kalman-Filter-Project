@@ -8,7 +8,7 @@ add_definitions(-std=c++11)
 
 #setting env variables
 set(CXX_FLAGS "-Wall")
-set(CMAKE_CXX_FLAGS, "${CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CXX_FLAGS}")
 
 #I assume setting the source files from which all others will be built
 #but what of the header files? Does it assume the header files are in the same directory?
